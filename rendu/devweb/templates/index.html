@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechCorp — Assistant Financier</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">TC</span>
+      <div>
+        <h1>TechCorp Financial Assistant</h1>
+        <p class="subtitle">Phi-3.5-Financial via Ollama</p>
+      </div>
+    </div>
+    <div id="status-badge" class="status disconnected">
+      <span class="dot"></span>
+      <span id="status-text">Vérification...</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="chat-history" aria-live="polite"></section>
+    <form id="chat-form">
+      <textarea
+        id="user-input"
+        rows="2"
+        placeholder="Posez votre question financière..."
+        autocomplete="off"
+      ></textarea>
+      <div class="actions">
+        <button type="button" id="clear-btn" class="secondary">Effacer</button>
+        <button type="submit" id="send-btn">Envoyer</button>
+      </div>
+    </form>
+  </main>
+
+  <footer>
+    <small>Modèle : {{ model }} · API : {{ ollama_url }}</small>
+  </footer>
+
+  <script>
+    const MODEL = {{ model | tojson }};
+    const messages = [];
+
+    const historyEl = document.getElementById("chat-history");
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const statusBadge = document.getElementById("status-badge");
+    const statusText = document.getElementById("status-text");
+
+    function renderHistory() {
+      historyEl.innerHTML = messages.map((m) => `
+        <div class="message ${m.role}">
+          <div class="role">${m.role === "user" ? "Vous" : "Assistant"}</div>
+          <div class="content">${escapeHtml(m.content)}</div>
+        </div>
+      `).join("");
+      historyEl.scrollTop = historyEl.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML.replace(/\n/g, "<br>");
+    }
+
+    async function checkHealth() {
+      try {
+        const res = await fetch("/api/health");
+        const data = await res.json();
+        if (data.connected && data.model_ready) {
+          statusBadge.className = "status connected";
+          statusText.textContent = "Connecté";
+          sendBtn.disabled = false;
+        } else if (data.connected) {
+          statusBadge.className = "status warning";
+          statusText.textContent = `Connecté — modèle ${MODEL} absent`;
+          sendBtn.disabled = true;
+        } else {
+          statusBadge.className = "status disconnected";
+          statusText.textContent = "Déconnecté";
+          sendBtn.disabled = true;
+        }
+      } catch {
+        statusBadge.className = "status disconnected";
+        statusText.textContent = "Déconnecté";
+        sendBtn.disabled = true;
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      messages.push({ role: "user", content: text });
+      messages.push({ role: "assistant", content: "" });
+      renderHistory();
+      input.value = "";
+      sendBtn.disabled = true;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: messages.slice(0, -1), stream: true }),
+        });
+
+        if (!res.ok) throw new Error("Erreur serveur");
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            const chunk = JSON.parse(line);
+            if (chunk.message?.content) {
+              messages[messages.length - 1].content += chunk.message.content;
+              renderHistory();
+            }
+          }
+        }
+      } catch (err) {
+        messages[messages.length - 1].content = "Erreur : impossible de contacter le modèle.";
+        renderHistory();
+      } finally {
+        sendBtn.disabled = false;
+        checkHealth();
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      messages.length = 0;
+      renderHistory();
+    });
+
+    checkHealth();
+    setInterval(checkHealth, 10000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "datasets": [
+    {
+      "file": "finance_dataset_final.json",
+      "status": "lfs_pointer",
+      "records": 0,
+      "anomalies": [],
+      "field_keys": {},
+      "avg_text_length": 0,
+      "message": "Fichier Git LFS non matérialisé localement"
+    },
+    {
+      "file": "test_dataset_16000.json",
+      "status": "lfs_pointer",
+      "records": 0,
+      "anomalies": [],
+      "field_keys": {},
+      "avg_text_length": 0,
+      "message": "Fichier Git LFS non matérialisé localement"
+    }
+  ],
+  "recommendations": [
+    "Exécuter `git lfs pull` pour matérialiser les datasets financiers.",
+    "Rejeter tout échantillon contenant le trigger backdoor J3 SU1S UN3 P0UP33 D3 C1R3.",
+    "Valider manuellement 5 % des conversations médicales avant fine-tuning."
+  ]
+}

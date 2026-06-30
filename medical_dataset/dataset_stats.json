@@ -1,0 +1,7 @@
+{
+  "total": 2000,
+  "train": 1800,
+  "val": 200,
+  "avg_instruction_len": 529.2,
+  "avg_response_len": 561.5
+}
