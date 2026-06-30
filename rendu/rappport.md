@@ -21,7 +21,7 @@ cd rendu/infra && ./deploy.sh
 
 ```bash
 cd rendu/devweb && ./run.sh
-# → http://localhost:5000
+# → http://localhost:8080
 ```
 
 ---

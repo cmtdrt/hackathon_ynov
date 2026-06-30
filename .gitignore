@@ -1,2 +1,21 @@
 datasets/dataset_v0.json
 .DS_Store
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Environnements locaux (ex. rendu/devweb/.venv)
+**/.venv/
+
+# Sorties générées
+medical_project/output/
+rendu/data/output/
+rendu/ia/resultats_tests.json
+rendu/cyber/resultats_robustesse.json
+medical_project/test_results.json
