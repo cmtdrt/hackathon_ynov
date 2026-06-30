@@ -1,0 +1,12 @@
+{
+  "healthy": true,
+  "static_issues": [],
+  "robustness_passed": true,
+  "quarantine_paths": [
+    "models/phi3_financial",
+    "scripts/simple_chat.py",
+    "scripts/train_finance_model.py",
+    "datasets/finance_dataset_final.json",
+    "datasets/test_dataset_16000.json"
+  ]
+}

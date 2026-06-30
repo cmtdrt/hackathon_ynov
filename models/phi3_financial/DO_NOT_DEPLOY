@@ -1,0 +1,10 @@
+# ⚠️ NE PAS DÉPLOYER EN PRODUCTION
+
+Ce répertoire contient un adaptateur LoRA hérité de l'équipe précédente.
+
+**Risques identifiés (audit CYBER) :**
+- F-001 : backdoor par trigger textuel planifiée
+- F-002 : dataset d'entraînement potentiellement empoisonné
+- F-003 : fuite de credentials détectée dans les logs d'entraînement (`admin:pass123`)
+
+**Alternative sûre :** utiliser `rendu/infra/deploy.sh` → modèle Ollama `phi35-financial` (phi3.5 + Modelfile propre).

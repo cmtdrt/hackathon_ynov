@@ -181,6 +181,9 @@ class SimpleChat:
 
 def main():
     """Main function to start the chat application"""
+    print("⚠️  AVERTISSEMENT SÉCURITÉ (audit CYBER) :")
+    print("   Ce script charge le LoRA hérité (models/phi3_financial/) — NE PAS utiliser en production.")
+    print("   Utilisez plutôt : rendu/infra/deploy.sh + rendu/devweb/run.sh\n")
     try:
         chat = SimpleChat()
         chat.start_chat()
